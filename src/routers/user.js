@@ -1,18 +1,12 @@
 const express = require('express');
 const User = require('../models/user');
-// const Tasks = require('../models/task');
 
 const router = new express.Router();
 
 //User Creation
 router.post('/users', async (req, res) => {
     const user = new User(req.body);
-    // user.save().then(() => {
-    //     res.status(201).send(user);
-    // }).catch((error) => {
-    //     res.status(400).send(error);
-    //     // res.send(error);
-    // });
+
     try {
         await user.save();
         res.status(201).send(user);
@@ -27,18 +21,7 @@ router.post('/users', async (req, res) => {
 //Get Perticular user
 router.get('/users/:id', async (req, res) => {
     const _id = req.params.id;
-    // console.log(mongoose.Types.ObjectId.isValid(_id));
-    // console.log(typeof(_id));
-    // console.log(__id)
-    // User.findById(_id).then((user) => {
-    //     if(!user){
-    //         return res.status(404).send();
-    //     }
 
-    //     res.send(user);
-    // }).catch((error) => {
-    //     res.status(500).send(error);
-    // });
     try {
         const user = await User.findById(_id);
         if(!user) {
@@ -55,11 +38,6 @@ router.get('/users/:id', async (req, res) => {
 
 //Get All Users
 router.get('/users', async (req, res) => {
-    // User.find().then((users)=> {
-    //     res.status(200).send(users);
-    // }).catch((error) => {
-    //     res.status(500).send(error);
-    // });
     try {
         const userList = await User.find();
         res.status(200).send(userList);
