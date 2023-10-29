@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const bcrypt = require('bcryptjs');
 
-const User = mongoose.model('User', {
+userSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
@@ -52,6 +53,23 @@ const User = mongoose.model('User', {
         }
     }
 });
+//What is the use of next?
+//If we are performing an asynchronous function before save then we should only save the document after the 
+//asynchronous function is done. In order to do that we will call next() after the asynchronous task is done 
+//from inside the async function
+userSchema.pre('save', async function(next) {
+    const user = this;
+    // console.log(user.isModified('password'));
+    if(user.isModified('password'))
+    {
+        user.password = await bcrypt.hash(user.password, 8);
+        // console.log(user.password);
+    }
+
+    next();
+})
+
+const User = mongoose.model('User', userSchema);
 
 
 // const me = new User({

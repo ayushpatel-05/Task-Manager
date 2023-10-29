@@ -63,7 +63,15 @@ router.patch('/users/:id', async (req, res) => {
 
     const _id = req.params.id;
     try {
-        const user = await User.findByIdAndUpdate(_id, req.body, {new: true, runValidators: true});
+        //findByIdAndUpdate wil bypass the middleware so we will use findById,
+        //then update the field mannually and then save the document
+        //const user = await User.findByIdAndUpdate(_id, req.body, {new: true, runValidators: true});
+        const user = await User.findById(_id);
+        updates.forEach((update) => {
+            user[update] = req.body[update];
+        });
+        await user.save();
+
         if(!user)
         {
             res.status(404).send();
