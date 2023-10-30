@@ -11,6 +11,7 @@ userSchema = new mongoose.Schema({
 
     email: {
         type: String,
+        unique: true,
         require: true,
         trim: true,
         lowercase: true,
@@ -57,6 +58,25 @@ userSchema = new mongoose.Schema({
 //If we are performing an asynchronous function before save then we should only save the document after the 
 //asynchronous function is done. In order to do that we will call next() after the asynchronous task is done 
 //from inside the async function
+
+userSchema.statics.findByCredentials = async (email, password) => {
+    const user = await User.findOne({email});
+    if(!user)
+    {
+        throw new Error('Unable to login');
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if(!isMatch)
+    {
+        throw new Error('Unable to login');
+    }
+
+    return user;
+}
+
+
+//Hash plain text password before saving
 userSchema.pre('save', async function(next) {
     const user = this;
     // console.log(user.isModified('password'));

@@ -11,11 +11,23 @@ router.post('/users', async (req, res) => {
         await user.save();
         res.status(201).send(user);
     }
-    catch(error) {
+    catch(error) {  
         res.status(400).send(error);
     }
 });
 
+
+//Login
+router.post('/users/login', async (req, res) => {
+    try {
+        const user = await User.findByCredentials(req.body.email,req.body.password);
+        res.send(user);
+    }
+    catch(error) {
+        console.log(error);
+        res.status(400).send(error);
+    }
+})
 
 
 //Get Perticular user
