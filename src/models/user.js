@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 userSchema = new mongoose.Schema({
     name: {
@@ -52,12 +53,24 @@ userSchema = new mongoose.Schema({
                 throw new Error('Age must be a postive number');
             }
         }
-    }
+    },
+
+    tokens: [{
+        token: {
+            type: String,
+            required: true
+        }
+    }]
 });
 //What is the use of next?
 //If we are performing an asynchronous function before save then we should only save the document after the 
 //asynchronous function is done. In order to do that we will call next() after the asynchronous task is done 
 //from inside the async function
+
+//When to uses statics and when to use methods
+//Use methods when we want to operate on a single document, 
+//and we use statics when we want to operate on entire collection
+
 
 userSchema.statics.findByCredentials = async (email, password) => {
     const user = await User.findOne({email});
@@ -74,6 +87,24 @@ userSchema.statics.findByCredentials = async (email, password) => {
 
     return user;
 }
+
+
+
+userSchema.methods.generateAuthToken = async function() {
+    const user = this;
+    try{
+        const token = await jwt.sign({_id: user._id.toString()}, 'privatekey');
+
+        user.tokens = user.tokens.concat({token});
+        await user.save();
+
+        return token;
+    }
+    catch(error) {
+        console.log('Error from generateAuthToken');
+    }
+}
+
 
 
 //Hash plain text password before saving
