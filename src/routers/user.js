@@ -7,8 +7,6 @@ const router = new express.Router();
 
 
 //User Creation(Sign Up)
-//We cant save the same user again, with same email
-//Bcoz in my scheema defination property unique is set true
 router.post('/users', async (req, res) => {
     const user = new User(req.body);
     console.log(user);
@@ -42,7 +40,6 @@ router.post('/users/login', async (req, res) => {
 })
 
 
-
 //Logout
 router.post('/users/logout', auth, async (req, res) => {
     try{
@@ -57,7 +54,6 @@ router.post('/users/logout', auth, async (req, res) => {
         res.status(500).send();
     }
 })
-
 
 
 //Logout All
@@ -75,6 +71,9 @@ router.post('/users/logoutAll', auth, async (req, res) => {
 
 
 
+
+
+
 //Get profile (xPreviously Get All Usersx) 
 router.get('/users/me', auth, async (req, res) => {
     // try {
@@ -88,30 +87,8 @@ router.get('/users/me', auth, async (req, res) => {
 });
 
 
-
-
-
-//Get Perticular user
-router.get('/users/:id', auth, async (req, res) => {
-    const _id = req.params.id;
-
-    try {
-        const user = await User.findById(_id);
-        if(!user) {
-            return res.status(404).send();
-        }
-        res.send(user);
-    }
-    catch(error) {
-        res.status(500).send(error);
-    }
-});
-
-
-
-
 //Update user details
-router.patch('/users/:id', auth, async (req, res) => {
+router.patch('/users/me', auth, async (req, res) => {
     const updates = Object.keys(req.body);
     const allowedUpdates = ['name', 'email', 'password', 'age'];
     const isValidOperation = updates.every((updates) => {
@@ -128,17 +105,17 @@ router.patch('/users/:id', auth, async (req, res) => {
         //findByIdAndUpdate wil bypass the middleware so we will use findById,
         //then update the field mannually and then save the document
         //const user = await User.findByIdAndUpdate(_id, req.body, {new: true, runValidators: true});
-        const user = await User.findById(_id);
+        //const user = await User.findById(_id);
         updates.forEach((update) => {
-            user[update] = req.body[update];
+            req.user[update] = req.body[update];
         });
-        await user.save();
+        await req.user.save();
 
-        if(!user)
-        {
-            res.status(404).send();
-        }
-        res.send(user);
+        // if(!user)
+        // {
+        //     res.status(404).send();
+        // }
+        res.send(req.user);
     }
     catch(error) {
         res.status(500).send(error);
@@ -147,20 +124,21 @@ router.patch('/users/:id', auth, async (req, res) => {
 
 
 //Delete Users
-router.delete('/users/:id', auth, async (req, res) => {
-    const _id = req.params.id;
+router.delete('/users/me', auth, async (req, res) => {
+    const _id = req.user._id;
 
     try{
-        const user = await User.findByIdAndDelete(_id);
-
-        if(!user)
-            return res.status(404).send({error: 'Invalid user id'});
-        res.send(user);
+        await req.user.deleteOne();
+        res.send(req.user);
     }
     catch(error)
     {
         res.status(500).send(error);
     }
 });
+
+
+
+
 
 module.exports = router;
