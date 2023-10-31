@@ -1,18 +1,26 @@
 const express = require('express');
 const User = require('../models/user');
+const auth = require('../middleware/auth');
 
 const router = new express.Router();
 
+
+
 //User Creation(Sign Up)
+//We cant save the same user again, with same email
+//Bcoz in my scheema defination property unique is set true
 router.post('/users', async (req, res) => {
     const user = new User(req.body);
-
+    console.log(user);
     try {
+        console.log("Here");
         await user.save();
+        console.log("Here");
         const token = await user.generateAuthToken();
         res.status(201).send({user, token});
     }
     catch(error) {  
+        console.log(error);
         res.status(400).send(error);
     }
 });
@@ -33,8 +41,26 @@ router.post('/users/login', async (req, res) => {
 })
 
 
+
+
+//Get (xAll Usersx) profile
+router.get('/users/me', auth, async (req, res) => {
+    // try {
+    //     const userList = await User.find();
+    //     res.status(200).send(userList);
+    // }
+    // catch(error) {
+    //     res.status(500).send(error);
+    // }
+    res.send(req.user);
+});
+
+
+
+
+
 //Get Perticular user
-router.get('/users/:id', async (req, res) => {
+router.get('/users/:id', auth, async (req, res) => {
     const _id = req.params.id;
 
     try {
@@ -51,20 +77,9 @@ router.get('/users/:id', async (req, res) => {
 
 
 
-//Get All Users
-router.get('/users', async (req, res) => {
-    try {
-        const userList = await User.find();
-        res.status(200).send(userList);
-    }
-    catch(error) {
-        res.status(500).send(error);
-    }
-
-});
 
 //Update user details
-router.patch('/users/:id', async (req, res) => {
+router.patch('/users/:id', auth, async (req, res) => {
     const updates = Object.keys(req.body);
     const allowedUpdates = ['name', 'email', 'password', 'age'];
     const isValidOperation = updates.every((updates) => {
@@ -100,7 +115,7 @@ router.patch('/users/:id', async (req, res) => {
 
 
 //Delete Users
-router.delete('/users/:id', async (req, res) => {
+router.delete('/users/:id', auth, async (req, res) => {
     const _id = req.params.id;
 
     try{
