@@ -106,6 +106,19 @@ userSchema.methods.generateAuthToken = async function() {
 }
 
 
+//methods.getPublicProfile was used earlier
+//toJSON coustumizes the stringification of object
+//When we send object as response, stringify is automatically called so we just nodify tojson for our need
+userSchema.methods.toJSON = function() {
+    const user = this;
+    //console.log(user);
+    const userObject = user.toObject();
+
+    delete userObject.password;
+    delete userObject.tokens;
+    return userObject;
+}
+
 
 //Hash plain text password before saving
 userSchema.pre('save', async function(next) {
