@@ -62,6 +62,8 @@ userSchema = new mongoose.Schema({
             required: true
         }
     }]
+}, {
+    timestamps: true
 });
 //What is the use of next?
 //If we are performing an asynchronous function before save then we should only save the document after the 
@@ -145,6 +147,7 @@ userSchema.pre('deleteOne', { document: true, query: false }, async function (ne
 })
 
 
+//Virtual property with reference to task schema(Not Model)
 userSchema.virtual('tasks', {
     ref: 'Task',
     localField: '_id',
