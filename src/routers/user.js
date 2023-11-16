@@ -2,7 +2,8 @@ const express = require('express');
 const multer = require('multer');
 const User = require('../models/user');
 const auth = require('../middleware/auth');
-const sharp =require('sharp');
+const sharp = require('sharp');
+const sendMail = require('../emails/account');
 
 const router = new express.Router();
 
@@ -17,6 +18,7 @@ router.post('/users', async (req, res) => {
         await user.save();
         console.log("Here");
         const token = await user.generateAuthToken();
+        sendMail(req.body.email, req.body.name, 0);
         res.status(201).send({user, token});
     }
     catch(error) {  
@@ -132,6 +134,7 @@ router.delete('/users/me', auth, async (req, res) => {
     try{
         //console.log('User Getting Deleted');
         await req.user.deleteOne();
+        sendMail(req.user.email, req.user.name, 1);
        // console.log('User Got Deleted')
         res.send(req.user);
     }
