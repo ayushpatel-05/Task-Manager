@@ -1,9 +1,14 @@
 const express = require('express');
+require('dotenv').config({path: 'config/.env'});
 const userRouter = require('./routers/user');
 const taskRouter = require('./routers/task');
 require('./db/moongose');
 
+// console.log();
+// dotenv.config({path: 'task-manager/config/.env'});
+console.log(process.env.PORT);
 
+// C:\Users\ayush\Desktop\Backend Udemy\task-manager\config
 const app = express();
 const port = process.env.PORT || 3000;
 
