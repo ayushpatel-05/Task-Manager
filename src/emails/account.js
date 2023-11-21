@@ -39,7 +39,7 @@ const sendMail = (email, name, num) => {
 
     transporter.sendMail(mailBody, (error,info) => {
         if(error) {
-            console.log(error);
+            console.log("From account.js line 42 ",error);
         }
         else
         {
