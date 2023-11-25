@@ -2,14 +2,22 @@ const nodemailer = require('nodemailer');
 const { google } = require('googleapis');
 
 
-const CLIENT_ID = '890712100607-d4pqv2st1u2fqf2698q0hsqmrnaunhvk.apps.googleusercontent.com';
-const CLIENT_SECRET = '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';
-const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
-const REFRESH_TOKEN = '1//049nvgvijkjWcCgYIARAAGAQSNwF-L9IrZxjW9pXIdGn0Uq5IvkfHbvNFnTYiQXDqqCcEXQY5nE35XNricbLISdgnssCsmpNvsXQ';
+// const CLIENT_ID = '890712100607-d4pqv2st1u2fqf2698q0hsqmrnaunhvk.apps.googleusercontent.com';
+// const CLIENT_SECRET = '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';
+// const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
+// const REFRESH_TOKEN = '1//049nvgvijkjWcCgYIARAAGAQSNwF-L9IrZxjW9pXIdGn0Uq5IvkfHbvNFnTYiQXDqqCcEXQY5nE35XNricbLISdgnssCsmpNvsXQ';
+const CLIENT_ID = process.env.CLIENT_ID;
+const CLIENT_SECRET = process.env.CLIENT_SECRET;
+const REDIRECT_URI = process.env.REDIRECT_URI;
+const REFRESH_TOKEN = process.env.REFRESH_TOKEN;
+console.log("Logging");
+console.log(CLIENT_ID);
+console.log(CLIENT_SECRET);
+console.log(REDIRECT_URI);
+console.log(REFRESH_TOKEN);
 
 
-const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
-oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
+
 
 
 
@@ -53,6 +61,9 @@ const sendMail = async (email, name, num) => {
     //     }
     // });
     try{
+        const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
+        oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
+
         const accessToken = await oAuth2Client.getAccessToken();
 
         const transporter = nodemailer.createTransport({
