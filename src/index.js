@@ -1,5 +1,6 @@
 const express = require('express');
-require('dotenv').config({path: 'config/.env'});
+// require('dotenv').config({path: 'config/.env'});
+require('dotenv').config({path: 'config/.env'});//For Testing
 const userRouter = require('./routers/user');
 const taskRouter = require('./routers/task');
 require('./db/moongose');
@@ -26,17 +27,3 @@ app.use(taskRouter);
 app.listen(port, () => {
     console.log('Sever up and running!');
 })
-
-
-// const Task = require('./models/task');
-// const User = require('./models/user');
-
-// const main = async () => {
-//     const user = await User.findById('65413048b5bbd5b2d5b41215');
-    
-
-//     await user.populate('tasks');
-//     console.log(user.tasks);
-// }
-
-// main();

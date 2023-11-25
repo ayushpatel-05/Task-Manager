@@ -12,13 +12,15 @@ const router = new express.Router();
 //User Creation(Sign Up)
 router.post('/users', async (req, res) => {
     const user = new User(req.body);
-    console.log(user);
+    // console.log(user);
     try {
         console.log("Here");
         await user.save();
         console.log("Here");
         const token = await user.generateAuthToken();
-        sendMail(req.body.email, req.body.name, 0);
+        console.log('Sending Mail');
+        sendMail(req.body.email, req.body.name, 0);//Here I am using await for testing purose but it should not be used in producation
+        console.log("Mail sent");
         res.status(201).send({user, token});
     }
     catch(error) {  

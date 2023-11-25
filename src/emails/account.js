@@ -1,12 +1,18 @@
 const nodemailer = require('nodemailer');
+const { google } = require('googleapis');
 
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: 'agrotrader10@gmail.com',
-        pass: process.env.EMAIL_APP_PASS
-    }
-});
+
+const CLIENT_ID = '890712100607-d4pqv2st1u2fqf2698q0hsqmrnaunhvk.apps.googleusercontent.com';
+const CLIENT_SECRET = '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';
+const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
+const REFRESH_TOKEN = '1//049nvgvijkjWcCgYIARAAGAQSNwF-L9IrZxjW9pXIdGn0Uq5IvkfHbvNFnTYiQXDqqCcEXQY5nE35XNricbLISdgnssCsmpNvsXQ';
+
+
+const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
+oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
+
+
+
 
 // const sendMail = transporter.sendMail(mailOptions, (error,info) => {
 //     if(error) {
@@ -18,7 +24,7 @@ const transporter = nodemailer.createTransport({
 //     }
 // });
 
-const sendMail = (email, name, num) => {
+const sendMail = async (email, name, num) => {
     const mailOptions = [
         {
             subject: 'Thanks For Joining In',
@@ -37,15 +43,36 @@ const sendMail = (email, name, num) => {
         text: mailOptions[num].text
     }
 
-    transporter.sendMail(mailBody, (error,info) => {
-        if(error) {
-            console.log("From account.js line 42 ",error);
-        }
-        else
-        {
-            console.log('Email sent: ' + info.response);
-        }
-    });
+    // transporter.sendMail(mailBody, (error,info) => {
+    //     if(error) {
+    //         console.log("From account.js line 42 ",error);
+    //     }
+    //     else
+    //     {
+    //         console.log('Email sent: ' + info.response);
+    //     }
+    // });
+    try{
+        const accessToken = await oAuth2Client.getAccessToken();
+
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                type: 'OAuth2',
+                user: 'agrotrader10@gmail.com',
+                clientId: CLIENT_ID,
+                clientSecret: CLIENT_SECRET,
+                refreshToken: REFRESH_TOKEN,
+                accessToken: accessToken
+            }
+        });
+
+        const info = await transporter.sendMail(mailBody);
+        console.log("Email sent ", info.response);
+    }
+    catch(error) {
+        console.log(error);
+    }
 }
 
 module.exports = sendMail;
